@@ -1,1 +1,1 @@
-# Corstice-Qora
+# frontend
