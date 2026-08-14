@@ -1,13 +1,14 @@
 from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, JSON, Boolean, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID  # Remove this if not used
 from sqlalchemy.orm import relationship
 from .database import Base
 import uuid
 from datetime import datetime
 
+# UUID ને બદલે String(36) વાપરો
 class User(Base):
     __tablename__ = "users"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = Column(String, unique=True, nullable=False)
     hashed_password = Column(String)
     full_name = Column(String)
@@ -15,8 +16,8 @@ class User(Base):
 
 class Project(Base):
     __tablename__ = "projects"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"))
     name = Column(String, nullable=False)
     country = Column(String, default="India")
     building_code = Column(String, default="NBC-2016")
@@ -26,8 +27,8 @@ class Project(Base):
 
 class Drawing(Base):
     __tablename__ = "drawings"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id"))
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    project_id = Column(String(36), ForeignKey("projects.id"))
     filename = Column(String)
     filepath = Column(String)
     status = Column(String, default="uploaded")
@@ -38,19 +39,19 @@ class Drawing(Base):
 
 class DrawingEntity(Base):
     __tablename__ = "drawing_entities"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    drawing_id = Column(UUID(as_uuid=True), ForeignKey("drawings.id"))
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    drawing_id = Column(String(36), ForeignKey("drawings.id"))
     entity_type = Column(String)
     layer = Column(String)
-    geometry = Column(JSON)   # {start: [x,y], end: [x,y]} or vertices etc.
+    geometry = Column(JSON)
     properties = Column(JSON)
     drawing = relationship("Drawing", back_populates="entities")
 
 class DetectedObject(Base):
     __tablename__ = "detected_objects"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    drawing_id = Column(UUID(as_uuid=True), ForeignKey("drawings.id"))
-    object_type = Column(String)   # wall, door, window, room
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    drawing_id = Column(String(36), ForeignKey("drawings.id"))
+    object_type = Column(String)
     confidence = Column(Float)
     geometry = Column(JSON)
     properties = Column(JSON)
@@ -59,9 +60,9 @@ class DetectedObject(Base):
 
 class Quantity(Base):
     __tablename__ = "quantities"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id"))
-    item_type = Column(String)   # wall, floor, plaster, painting
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    project_id = Column(String(36), ForeignKey("projects.id"))
+    item_type = Column(String)
     gross = Column(Float)
     deduction = Column(Float, default=0)
     net = Column(Float)
@@ -70,8 +71,8 @@ class Quantity(Base):
 
 class BOQItem(Base):
     __tablename__ = "boq_items"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id"))
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    project_id = Column(String(36), ForeignKey("projects.id"))
     description = Column(String)
     quantity = Column(Float)
     unit = Column(String)
